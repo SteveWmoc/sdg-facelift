@@ -66,7 +66,7 @@ noncomputable def deriv : Derivation R (R → R) (R → R) where
 
 instance : FunLike (Derivation R (R → R) (R → R)) (R → R) (R → R) where
   coe D := D.toFun
-  coe_injective' D1 D2 h := by cases D1; cases D2; congr; exact DFunLike.coe_injective h
+  coe_injective D1 D2 h := by cases D1; cases D2; congr; exact DFunLike.coe_injective h
 
 theorem deriv_mul (f g : R → R) : ∂(f * g) = ∂f * g + f * ∂g := by
   change deriv (f * g) = deriv f * g + f * deriv g
