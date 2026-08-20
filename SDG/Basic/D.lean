@@ -83,7 +83,8 @@ lemma D_add_sq_dvd_two [Invertible (2 : R)] (d₁ d₂ : D R) :
 variable (R) in
 lemma coe_sq : ((↑) : D R → R) * (↑) = 0 := by
   ext d
-  simpa only [← pow_two, Pi.zero_apply] using D_mem_iff.1 d.2
+  change (d : R) ^ 2 = 0
+  exact D_mem_iff.1 d.2
 
 variable (R) (k : ℕ) in
 lemma coe_pow : ((↑) : 𝔻 R k → R) ^ (k + 1) = 0 := by
