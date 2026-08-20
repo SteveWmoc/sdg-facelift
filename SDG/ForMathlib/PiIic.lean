@@ -33,7 +33,11 @@ def prod_of_Iic (f : Iic k → T) : (Fin (k (last n) + 1)) → (Iic (init k)) �
   refine mem_Iic.2 (fun j ↦ ?_)
   by_cases h : j = last _
   · simp [h]; omega
-  · simpa [init, castSucc_castPred j h, h] using le_def.1 (mem_Iic.1 i.2) _⟩
+  · simp only [h, if_false]
+    change Nat.le (i.1 (castPred j h)) (k j)
+    have hi := le_def.1 (mem_Iic.1 i.2) (castPred j h)
+    change Nat.le (i.1 (castPred j h)) (init k (castPred j h)) at hi
+    simpa [init, castSucc_castPred j h] using hi⟩
 
 lemma prod_of_Iic_of_prod (f : (Fin (k (last n) + 1)) → (Iic (init k)) → T) :
     prod_of_Iic (Iic_of_prod f) = f := by
@@ -51,7 +55,11 @@ def Iic_equiv : Fin (k (last n) + 1) × (Iic (init k)) ≃ (Iic k) where
     refine mem_Iic.2 (fun j ↦ ?_)
     by_cases h : j = last _
     · simp [h]; omega
-    · simpa [init, castSucc_castPred j h, h] using le_def.1 (mem_Iic.1 p.2.2) _⟩
+    · simp only [h, if_false]
+      change Nat.le (p.2.1 (castPred j h)) (k j)
+      have hi := le_def.1 (mem_Iic.1 p.2.2) (castPred j h)
+      change Nat.le (p.2.1 (castPred j h)) (init k (castPred j h)) at hi
+      simpa [init, castSucc_castPred j h] using hi⟩
   invFun y := (⟨y.1 (last n), Nat.lt_add_one_iff.mpr ((le_def.1 <| mem_Iic.1 y.2) _)⟩,
     ⟨init y.1, mem_Iic.2 (le_def.2 fun i ↦ le_def.1 (mem_Iic.1 y.2) (castSucc i))⟩)
   left_inv p := Prod.ext (Fin.ext (by simp))
