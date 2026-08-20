@@ -27,9 +27,6 @@ jobs:
           use-github-cache: false
           use-mathlib-cache: false
 
-      - name: Resolve dependencies
-        run: lake update
-
       - name: Download Mathlib cache
         run: lake exe cache get
 
