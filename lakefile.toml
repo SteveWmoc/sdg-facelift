@@ -10,6 +10,7 @@ linter.flexible = true
 linter.mathlibStandardSet = true
 weak.linter.verbose.detectClassical = true
 warn.sorry = false
+backward.isDefEq.respectTransparency = false
 
 [[require]]
 name = "mathlib"
