@@ -102,7 +102,8 @@ private lemma mixed_partial_deriv_comm_partial_deriv_aux :
   haveI hm : Fact (m ≤ n) := ⟨Nat.le_of_succ_le_succ hle.out⟩
   simpa [mixed_partial_deriv_succ_eq_deriv_init,
     mixed_partial_deriv_comm_partial_deriv_aux (init k) f i] using
-    partial_deriv_iterate_comm f (castLE (Nat.add_le_add_right hm.out 1) (last m)) i (k (last m)) 1
+    partial_deriv_iterate_comm (∂[init k] f)
+      (castLE (Nat.add_le_add_right hm.out 1) (last m)) i (k (last m)) 1
 
 lemma mixed_partial_deriv_comm_partial_deriv_iterate (i : Fin n) (j : ℕ) :
     ∂[k] (∂_[i]^[j]f) = ∂_[i]^[j](∂[k] f) := by
@@ -166,7 +167,7 @@ theorem taylor_multi_aux_aux : ∀ {n} (k : Fin n → ℕ) (f : (Fin n → R) �
     · simp [hi]
     · obtain ⟨j, rfl⟩ := exists_castSucc_eq.2 hi; simp [init]
   have hg : ∀ i, ∂_[last n]^[i] f (snoc (init (r + d)) (r (last n))) = ∂^[i] g (r (last n)) :=
-    fun i ↦ by simpa using partial_deriv_iterate_eq_deriv_snoc_init i f (snoc _ _)
+    fun i ↦ by simpa [g] using partial_deriv_iterate_eq_deriv_snoc_init i f (snoc _ _)
   have hh : ∀ i, ∂_[last n]^[i] f (snoc (init (r + d)) (r (last n))) = h i (init (r + d)) :=
     fun _ ↦ rfl
   simp_rw [hfg, taylor_k g _ (k (last n)), ← hg, hh, init_R_add_D_fun,]
