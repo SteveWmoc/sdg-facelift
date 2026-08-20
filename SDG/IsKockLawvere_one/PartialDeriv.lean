@@ -74,7 +74,7 @@ noncomputable def partial_deriv : Derivation R ((Fin n → R) → R) ((Fin n →
 instance : FunLike (Derivation R ((Fin n → R) → R) ((Fin n → R) → R))
     ((Fin n → R) → R) ((Fin n → R) → R) where
   coe D := D.toFun
-  coe_injective' := DFunLike.coe_injective
+  coe_injective := DFunLike.coe_injective
 
 variable (x)
 
@@ -113,12 +113,12 @@ lemma partial_deriv_eq_deriv_snoc_init (f : (Fin (n + 1) → R) → R) (r : Fin 
 
 lemma partial_deriv_iterate_eq_deriv_snoc_init (k : ℕ) (f : (Fin (n + 1) → R) → R)
   (r : Fin (n + 1) → R) :
-    ∂_[last n]^[k] f r = ∂^[k] (fun t ↦ f (snoc (init r) t)) (r (last n)) := by
-match k with
-| 0 => simp [snoc_init_self]
-| k + 1 =>
-  simp only [Function.iterate_succ', Function.comp_def]
-  simp [partial_deriv_eq_deriv_snoc_init, partial_deriv_iterate_eq_deriv_snoc_init]
+    ∂_[last n]^[k] f r = ∂^[k] (fun t ↦ f (snoc (init r) t)) (r (last n)) :=
+  match k with
+  | 0 => by simp [snoc_init_self]
+  | k + 1 => by
+    simp only [Function.iterate_succ', Function.comp_def]
+    simp [partial_deriv_eq_deriv_snoc_init, partial_deriv_iterate_eq_deriv_snoc_init]
 
 lemma partial_deriv_snoc_castSucc (i : Fin n) (f : (Fin (n + 1) → R) → R)
     (r : Fin n → R) (c : R) :
