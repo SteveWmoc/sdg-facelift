@@ -35,7 +35,7 @@ theorem prod_castLE_of_eq_one {a b : ℕ} (h : a ≤ b) (f : Fin b → M)
   rcases Nat.exists_eq_add_of_le h with ⟨k, rfl⟩
   rw [prod_univ_add]
   convert mul_one _
-  · exact Fin.ext rfl
   · exact Finset.prod_eq_one (fun i _ ↦ hf _ (Nat.le_add_right ..))
+  · exact Fin.ext rfl
 
 end Fin
