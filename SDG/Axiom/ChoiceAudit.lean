@@ -14,8 +14,16 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms SDG.FinChoiceFree.sum
 #print axioms SDG.FinChoiceFree.prod_cons_one
 #print axioms SDG.FinChoiceFree.sum_cons_zero
+#print axioms SDG.FinChoiceFree.prod_snoc
+#print axioms SDG.FinChoiceFree.sum_snoc
+#print axioms SDG.FinChoiceFree.prod_snoc_apply
+#print axioms SDG.FinChoiceFree.sum_snoc_apply
 #print axioms SDG.FinChoiceFree.prod_snoc_one
 #print axioms SDG.FinChoiceFree.sum_snoc_zero
+#print axioms SDG.FinChoiceFree.prod_castLE_of_eq_one
+#print axioms SDG.FinChoiceFree.sum_castLE_of_eq_zero
+#print axioms SDG.FinChoiceFree.prod_eq_univ
+#print axioms SDG.FinChoiceFree.sum_eq_univ
 
 #print axioms Fin.prod_univ_succAbove
 #print axioms Fin.prod_univ_succ
