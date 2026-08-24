@@ -69,11 +69,12 @@ lemma mem_D_sum_pow_succ : ∀ {k : ℕ} (b : Fin k → D R),
   rw [FinChoiceFree.sum_succ, mem_D_add_pow, mem_D_sum_pow_succ, mul_zero, zero_add,
     pow_succ, mem_D_sum_pow_succ, zero_mul]
 
-open Nat in
 lemma mem_D_sum_pow : ∀ {k : ℕ} (b : Fin k → D R),
     (FinChoiceFree.sum k (fun i => (b i : R))) ^ k =
       (k ! : R) * FinChoiceFree.prod k (fun i => (b i).1)
-| 0 => by rfl
+| 0 => fun _ ↦ by
+  simp only [FinChoiceFree.sum_zero, FinChoiceFree.prod_zero, pow_zero, factorial_zero,
+    cast_one, one_mul]
 | k + 1 => fun b ↦ by
   rw [FinChoiceFree.sum_succ, mem_D_add_pow, mem_D_sum_pow_succ, add_zero, mem_D_sum_pow,
     FinChoiceFree.prod_succ, factorial_succ, cast_mul]
@@ -86,7 +87,6 @@ lemma mem_D_univ_sum_pow_succ {k : ℕ} (b : Fin k → D R) :
   exact mem_D_sum_pow_succ b
 
 /-- Compatibility bridge with a generic sum on the left and the choice-free product on the right. -/
-open Nat in
 lemma mem_D_univ_sum_pow {k : ℕ} (b : Fin k → D R) :
     (∑ i, (b i : R)) ^ k = (k ! : R) * FinChoiceFree.prod k (fun i => (b i).1) := by
   rw [← FinChoiceFree.sum_eq_univ]
