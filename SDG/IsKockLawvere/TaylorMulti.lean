@@ -14,7 +14,11 @@ open Function Finset Nat Fin
 
 namespace SDG
 
-variable {R : Type*} [CommRing R] [IsKockLawvere_one R]
+variable {R : Type*} [CommRing R]
+
+section IsKockLawvereOne
+
+variable [IsKockLawvere_one R]
 
 variable {n m : ℕ} [h : Fact (m ≤ n)] (k : Fin m → ℕ)
   (f : (Fin n → R) → R) (d : Π i, 𝔻 R (k i)) (r : Fin n → R)
@@ -148,6 +152,11 @@ theorem mixed_partial_deriv_initial (k : Fin (n + 1) → ℕ) (f : (Fin (n + 1) 
   conv_lhs =>
     rw [mixed_partial_deriv_succ_eq_init_deriv, ← snoc_init_self r, mixed_partial_deriv_snoc]
   rfl
+
+end IsKockLawvereOne
+
+variable {n m : ℕ} [h : Fact (m ≤ n)] (k : Fin m → ℕ)
+  (f : (Fin n → R) → R) (d : Π i, 𝔻 R (k i)) (r : Fin n → R)
 
 variable [Algebra ℚ R] [IsKockLawvere R]
 
