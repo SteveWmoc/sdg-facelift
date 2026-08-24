@@ -34,38 +34,42 @@ theorem taylor_two [Invertible (2 : R)] (f : R → R) (x : R) (δ : 𝔻 R 2) :
   simp [((cancel_d (fun _ ↦ cancel_d (fun _ ↦ this _ _))).symm : ∂∂f x = b 1 * 2), mul_assoc,
     mul_comm ((δ : R) ^ 2)]
 
-/-- A direct nonzero criterion for natural-number casts into `ℚ`, avoiding generic `CharZero`
-instance machinery. -/
+/-- A direct nonzero criterion for natural-number casts into `ℚ`, using the rational numerator. -/
 lemma rat_natCast_ne_zero {n : ℕ} (hn : n ≠ 0) : (n : ℚ) ≠ 0 := by
   intro h
-  apply hn
-  apply Rat.natCast_injective
-  simpa only [Nat.cast_zero] using h
+  have hnum : (n : ℤ) = 0 := by
+    simpa only [Rat.num_natCast, Rat.num_zero] using congrArg Rat.num h
+  exact hn (Int.ofNat.inj hnum)
 
 open Nat in
 lemma inv_factorial_smul_succ_iff {R : Type*} [CommRing R] [Algebra ℚ R] {n : ℕ} {x y : R} :
     (n ! : ℚ)⁻¹ • y = ((n + 1)! : ℚ)⁻¹ • x ↔ x = (n + 1) * y := by
   have hfact : (n ! : ℚ) ≠ 0 := rat_natCast_ne_zero (factorial_ne_zero n)
   have hsuccfact : ((n + 1)! : ℚ) ≠ 0 := rat_natCast_ne_zero (factorial_ne_zero (n + 1))
-  have hn1 : (n + 1 : ℚ) ≠ 0 := rat_natCast_ne_zero (Nat.succ_ne_zero n)
-  have hfac : ((n + 1)! : ℚ) = (n + 1 : ℚ) * (n ! : ℚ) := by
+  have hn1 : (↑(n + 1) : ℚ) ≠ 0 := rat_natCast_ne_zero (Nat.succ_ne_zero n)
+  have hfac : ((n + 1)! : ℚ) = (↑(n + 1) : ℚ) * (n ! : ℚ) := by
     rw [factorial_succ, Nat.cast_mul]
-  have hstep : (n + 1 : ℚ) • y = (n + 1 : R) * y := by
+  have hstep : (↑(n + 1) : ℚ) • y = (↑(n + 1) : R) * y := by
     rw [Algebra.smul_def, map_natCast]
   constructor
   · intro h
     have h' := congrArg (fun z : R ↦ ((n + 1)! : ℚ) • z) h
     rw [smul_smul, smul_smul] at h'
-    have hleft : ((n + 1)! : ℚ) * (n ! : ℚ)⁻¹ = (n + 1 : ℚ) := by
+    have hleft : ((n + 1)! : ℚ) * (n ! : ℚ)⁻¹ = (↑(n + 1) : ℚ) := by
       rw [hfac, mul_assoc, mul_inv_cancel₀ hfact, mul_one]
     have hright : ((n + 1)! : ℚ) * ((n + 1)! : ℚ)⁻¹ = 1 :=
       mul_inv_cancel₀ hsuccfact
     rw [hleft, hright, one_smul] at h'
-    exact h'.symm.trans hstep
+    calc
+      x = (↑(n + 1) : ℚ) • y := h'.symm
+      _ = (↑(n + 1) : R) * y := hstep
+      _ = (n + 1) * y := by rw [Nat.cast_succ]
   · intro h
-    have hx : x = (n + 1 : ℚ) • y := h.trans hstep.symm
+    have hxR : x = (↑(n + 1) : R) * y := by
+      simpa only [Nat.cast_succ] using h
+    have hx : x = (↑(n + 1) : ℚ) • y := hxR.trans hstep.symm
     rw [hx, smul_smul]
-    have hscalar : ((n + 1)! : ℚ)⁻¹ * (n + 1 : ℚ) = (n ! : ℚ)⁻¹ := by
+    have hscalar : ((n + 1)! : ℚ)⁻¹ * (↑(n + 1) : ℚ) = (n ! : ℚ)⁻¹ := by
       rw [hfac, mul_inv_rev, mul_assoc, inv_mul_cancel₀ hn1, mul_one]
     rw [hscalar]
 
