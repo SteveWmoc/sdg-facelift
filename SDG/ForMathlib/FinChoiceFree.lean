@@ -24,6 +24,11 @@ def sum {M : Type*} [AddMonoid M] : (n : ℕ) → (Fin n → M) → M
   | 0, _ => 0
   | n + 1, f => f 0 + sum n (fun i => f i.succ)
 
+/-- Nondependent primitive-recursive `snoc` for `Fin`-indexed tuples. -/
+def snoc {α : Type*} : (n : ℕ) → (Fin n → α) → α → Fin (n + 1) → α
+  | 0, _, x => fun _ => x
+  | n + 1, f, x => Fin.cons (f 0) (snoc n (fun i => f i.succ) x)
+
 @[simp]
 theorem prod_zero {M : Type*} [Monoid M] (f : Fin 0 → M) : prod 0 f = 1 := rfl
 
@@ -48,37 +53,21 @@ theorem sum_cons_zero {M : Type*} [AddMonoid M] {n : ℕ} (f : Fin n → M) :
     sum (n + 1) (Fin.cons 0 f) = sum n f := by
   simp [sum]
 
-private theorem snoc_tail {α : Type*} {n : ℕ} (f : Fin (n + 1) → α) (x : α) :
-    (fun i : Fin (n + 1) => Fin.snoc f x i.succ) =
-      Fin.snoc (fun i : Fin n => f i.succ) x := by
-  ext i
-  rcases Fin.eq_castSucc_or_eq_last i with ⟨j, rfl⟩ | rfl <;> simp
-
 @[simp]
 theorem prod_snoc_one {M : Type*} [Monoid M] :
-    ∀ {n : ℕ} (f : Fin n → M), prod (n + 1) (Fin.snoc f 1) = prod n f
+    ∀ (n : ℕ) (f : Fin n → M), prod (n + 1) (snoc n f 1) = prod n f
   | 0, f => by
-      change Fin.snoc f 1 0 = 1
-      simpa using Fin.snoc_last (1 : M) f
+      simp [prod, snoc]
   | n + 1, f => by
-      change Fin.snoc f 1 0 * prod (n + 1) (fun i => Fin.snoc f 1 i.succ) =
-        f 0 * prod n (fun i => f i.succ)
-      have h0 : Fin.snoc f 1 (0 : Fin (n + 2)) = f 0 := by
-        simpa using Fin.snoc_castSucc (1 : M) f (0 : Fin (n + 1))
-      rw [h0, snoc_tail f 1, prod_snoc_one]
+      simp [prod, snoc, prod_snoc_one n (fun i => f i.succ)]
 
 @[simp]
 theorem sum_snoc_zero {M : Type*} [AddMonoid M] :
-    ∀ {n : ℕ} (f : Fin n → M), sum (n + 1) (Fin.snoc f 0) = sum n f
+    ∀ (n : ℕ) (f : Fin n → M), sum (n + 1) (snoc n f 0) = sum n f
   | 0, f => by
-      change Fin.snoc f 0 0 = 0
-      simpa using Fin.snoc_last (0 : M) f
+      simp [sum, snoc]
   | n + 1, f => by
-      change Fin.snoc f 0 0 + sum (n + 1) (fun i => Fin.snoc f 0 i.succ) =
-        f 0 + sum n (fun i => f i.succ)
-      have h0 : Fin.snoc f 0 (0 : Fin (n + 2)) = f 0 := by
-        simpa using Fin.snoc_castSucc (0 : M) f (0 : Fin (n + 1))
-      rw [h0, snoc_tail f 0, sum_snoc_zero]
+      simp [sum, snoc, sum_snoc_zero n (fun i => f i.succ)]
 
 end FinChoiceFree
 end SDG
