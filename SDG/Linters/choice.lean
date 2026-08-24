@@ -41,8 +41,7 @@ def detectClassicalLinter : Linter where run := withSetOptionIn fun stx ↦ do
   for constStx in nms do
     let constName := constStx.getId
     let axioms ← collectAxioms constName
-    if !axioms.contains `Classical.choice && !axioms.contains `sorryAx then return
-    else
+    if axioms.contains `Classical.choice || axioms.contains `sorryAx then
       if !axioms.contains `Classical.choice then
         Linter.logLint linter.detectClassical constStx m!"'{constName}' depends on 'sorry'.\n"
       else
