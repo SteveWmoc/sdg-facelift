@@ -60,22 +60,37 @@ theorem mem_D_add_pow (x : D R) (y : R) : ∀ (k : ℕ), (x + y) ^ (k + 1) =
     (k + 1) * x ^ 2 * y ^ k := by ring
        _ = _ := by simp; ring
 
-lemma mem_D_sum_pow_succ : ∀ {k : ℕ} (b : Fin k → D R), (∑ i, (b i : R)) ^ (k + 1) = 0
-| 0 => fun b ↦ by
+lemma mem_D_sum_pow_succ : ∀ {k : ℕ} (b : Fin k → D R),
+    (FinChoiceFree.sum k (fun i => (b i : R))) ^ (k + 1) = 0
+| 0 => fun _ ↦ by
   rw [zero_add, pow_one]
-  exact sum_empty
+  rfl
 | k + 1 => fun b ↦ by
-  rw [Fin.sum_univ_succ, mem_D_add_pow, mem_D_sum_pow_succ, mul_zero, zero_add, pow_succ,
-    mem_D_sum_pow_succ, zero_mul]
+  rw [FinChoiceFree.sum_succ, mem_D_add_pow, mem_D_sum_pow_succ, mul_zero, zero_add,
+    pow_succ, mem_D_sum_pow_succ, zero_mul]
 
 open Nat in
 lemma mem_D_sum_pow : ∀ {k : ℕ} (b : Fin k → D R),
-    (∑ i, (b i : R)) ^ k = (k ! : R) * FinChoiceFree.prod k (fun i => (b i).1)
-| 0 => by simp
+    (FinChoiceFree.sum k (fun i => (b i : R))) ^ k =
+      (k ! : R) * FinChoiceFree.prod k (fun i => (b i).1)
+| 0 => by rfl
 | k + 1 => fun b ↦ by
-  rw [Fin.sum_univ_succ, mem_D_add_pow, mem_D_sum_pow_succ, add_zero, mem_D_sum_pow,
+  rw [FinChoiceFree.sum_succ, mem_D_add_pow, mem_D_sum_pow_succ, add_zero, mem_D_sum_pow,
     FinChoiceFree.prod_succ, factorial_succ, cast_mul]
   ring
+
+/-- Compatibility bridge for code that still uses Mathlib's generic finite sum. -/
+lemma mem_D_univ_sum_pow_succ {k : ℕ} (b : Fin k → D R) :
+    (∑ i, (b i : R)) ^ (k + 1) = 0 := by
+  rw [← FinChoiceFree.sum_eq_univ]
+  exact mem_D_sum_pow_succ b
+
+/-- Compatibility bridge with a generic sum on the left and the choice-free product on the right. -/
+open Nat in
+lemma mem_D_univ_sum_pow {k : ℕ} (b : Fin k → D R) :
+    (∑ i, (b i : R)) ^ k = (k ! : R) * FinChoiceFree.prod k (fun i => (b i).1) := by
+  rw [← FinChoiceFree.sum_eq_univ]
+  exact mem_D_sum_pow b
 
 lemma D_add_sq_dvd_two [Invertible (2 : R)] (d₁ d₂ : D R) :
     (d₁ + d₂ : R) ^ 2 * ⅟2 = d₁ * d₂ := by
