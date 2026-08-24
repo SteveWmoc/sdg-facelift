@@ -1,7 +1,6 @@
 module
 
-public import Mathlib.Algebra.Group.Defs
-public import Mathlib.Data.Fin.Basic
+public import Mathlib.Algebra.BigOperators.Fin
 
 /-!
 # Choice-free finite folds over `Fin`
