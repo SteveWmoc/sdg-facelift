@@ -58,12 +58,14 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms map_one
 #print axioms Nat.cast_ne_zero
 #print axioms Nat.cast_mul
+#print axioms Rat.natCast_injective
 #print axioms mul_inv_cancel₀
 #print axioms inv_mul_cancel₀
 #print axioms mul_inv_rev
 #print axioms smul_smul
 #print axioms one_smul
 
+#print axioms SDG.rat_natCast_ne_zero
 #print axioms SDG.inv_factorial_smul_succ_iff
 #print axioms SDG.inv_natCast_smul_natCast
 #print axioms SDG.partial_deriv_propr
