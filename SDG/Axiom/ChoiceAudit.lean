@@ -51,6 +51,19 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms SDG.mem_D_univ_sum_pow_succ
 #print axioms SDG.mem_D_univ_sum_pow
 
+-- Rational-scalar dependency roots.
+#print axioms Algebra.smul_def
+#print axioms map_natCast
+#print axioms map_mul
+#print axioms map_one
+#print axioms Nat.cast_ne_zero
+#print axioms Nat.cast_mul
+#print axioms mul_inv_cancel₀
+#print axioms inv_mul_cancel₀
+#print axioms mul_inv_rev
+#print axioms smul_smul
+#print axioms one_smul
+
 #print axioms SDG.inv_factorial_smul_succ_iff
 #print axioms SDG.inv_natCast_smul_natCast
 #print axioms SDG.partial_deriv_propr
