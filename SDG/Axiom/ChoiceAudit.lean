@@ -68,6 +68,24 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms smul_smul
 #print axioms one_smul
 
+-- Concrete rational structure dictionaries and statement-only inverse probes.
+#print axioms Rat.commRing
+#print axioms Rat.commGroupWithZero
+#print axioms Rat.instField
+#print axioms Rat.instDivisionRing
+
+namespace SDG.Axiom
+
+theorem ratInv_refl (q : ℚ) : q⁻¹ = q⁻¹ := rfl
+
+theorem ratInvSmul_refl {R : Type*} [CommRing R] [Algebra ℚ R] (q : ℚ) (x : R) :
+    q⁻¹ • x = q⁻¹ • x := rfl
+
+end SDG.Axiom
+
+#print axioms SDG.Axiom.ratInv_refl
+#print axioms SDG.Axiom.ratInvSmul_refl
+
 #print axioms SDG.rat_natCast_ne_zero
 #print axioms SDG.inv_factorial_smul_succ_iff
 #print axioms SDG.inv_natCast_smul_natCast
