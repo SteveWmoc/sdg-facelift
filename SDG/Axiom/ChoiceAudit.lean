@@ -48,6 +48,8 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms SDG.cancel_d_fun
 #print axioms SDG.mem_D_sum_pow_succ
 #print axioms SDG.mem_D_sum_pow
+#print axioms SDG.mem_D_univ_sum_pow_succ
+#print axioms SDG.mem_D_univ_sum_pow
 
 #print axioms SDG.inv_factorial_smul_succ_iff
 #print axioms SDG.inv_natCast_smul_natCast
