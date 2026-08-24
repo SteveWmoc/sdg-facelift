@@ -80,7 +80,7 @@ match k with
   rcases (eq_castSucc_or_eq_last n).symm with rfl | ⟨m', rfl⟩
   · simp only [succ_eq_add_one, snoc_last, val_succ, Function.iterate_succ,
     Function.comp_apply, cons_last, val_last, zero_add, mul_assoc]
-    rw [hδΔ, mem_D_add_pow, mem_D_sum_pow_succ, add_zero,
+    rw [hδΔ, mem_D_add_pow, mem_D_univ_sum_pow_succ, add_zero,
       mul_comm (↑(k + 1) : R), mul_assoc, mul_comm (↑(k + 1) : R)]
     congr
     simp [inv_factorial_smul_succ_iff]
@@ -118,19 +118,19 @@ theorem taylor_k_aux' [Algebra ℚ R] (k : ℕ) (f : R → R) (x : R) (b : Fin (
   refine cancel_d_fun (n + 2) (fun d ↦ ?_)
   set δ := ∑ n, (d n).1 with hδ_def
   have hb_deriv := taylor_k_aux_zero k f x b hb
-  have Hb := hb ⟨δ, 𝔻_le (succ_le_of_lt hn) (mem_D_sum_pow_succ d)⟩
+  have Hb := hb ⟨δ, 𝔻_le (succ_le_of_lt hn) (mem_D_univ_sum_pow_succ d)⟩
   rw [taylor_k_aux f, ← hδ_def, sum_univ_succ (n := n + 2), val_zero, Function.iterate_zero,
     id_eq, pow_zero, factorial_zero, cast_one, inv_one, one_smul, mul_one, add_right_inj,
       sum_univ_succ (n := k), val_zero, zero_add, pow_one, hb_deriv, sum_univ_succ (n := n + 1),
       val_succ, val_zero, zero_add, Function.iterate_one, pow_one, factorial_one, cast_one,
       inv_one, one_smul, add_right_inj, sum_castLE_of_eq_zero (le_of_lt_succ hn) _
-      (fun _ h ↦ by convert mul_zero _; exact 𝔻_le (succ_le_succ h) (mem_D_sum_pow_succ d)),
+      (fun _ h ↦ by convert mul_zero _; exact 𝔻_le (succ_le_succ h) (mem_D_univ_sum_pow_succ d)),
       sum_univ_succAbove _ (last n), sum_univ_succAbove _ (last n)] at Hb
   replace Hb := (eq_iff_eq_of_add_eq_add Hb).mpr ?_
   · simp only [succ_eq_add_one, succ_mk, Function.iterate_succ, Function.comp_apply]
     simp only [succ_last, succ_eq_add_one, val_last, Function.iterate_succ,
       Function.comp_apply, val_succ, val_castLE] at Hb
-    rw [mem_D_sum_pow d, mul_comm ((n + 2)! : R), mul_comm _ ((n + 2)! : R), ← smul_mul_assoc,
+    rw [mem_D_univ_sum_pow d, mul_comm ((n + 2)! : R), mul_comm _ ((n + 2)! : R), ← smul_mul_assoc,
       inv_natCast_smul_natCast (factorial_ne_zero _), one_mul] at Hb
     exact Hb ▸ mul_assoc ..
   · congr
