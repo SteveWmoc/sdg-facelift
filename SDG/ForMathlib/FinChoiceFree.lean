@@ -59,7 +59,9 @@ theorem prod_snoc_one {M : Type*} [Monoid M] :
   | 0, f => by
       simp [prod, snoc]
   | n + 1, f => by
-      simp [prod, snoc, prod_snoc_one n (fun i => f i.succ)]
+      change f 0 * prod (n + 1) (snoc n (fun i => f i.succ) 1) =
+        f 0 * prod n (fun i => f i.succ)
+      rw [prod_snoc_one n (fun i => f i.succ)]
 
 @[simp]
 theorem sum_snoc_zero {M : Type*} [AddMonoid M] :
@@ -67,7 +69,9 @@ theorem sum_snoc_zero {M : Type*} [AddMonoid M] :
   | 0, f => by
       simp [sum, snoc]
   | n + 1, f => by
-      simp [sum, snoc, sum_snoc_zero n (fun i => f i.succ)]
+      change f 0 + sum (n + 1) (snoc n (fun i => f i.succ) 0) =
+        f 0 + sum n (fun i => f i.succ)
+      rw [sum_snoc_zero n (fun i => f i.succ)]
 
 end FinChoiceFree
 end SDG
