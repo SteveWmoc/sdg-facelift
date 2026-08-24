@@ -35,7 +35,7 @@ theorem false_of_isKockLawvere_one : False := by
 
 lemma nontrivial_D : Nontrivial (D R) := by
   have := D_ne_zero R
-  simp only [Subsemigroup.mem_mk, Set.mem_setOf_eq, not_forall] at this
+  simp only [Subsemigroup.mem_mk, Set.mem_ofPred_eq, not_forall] at this
   obtain ⟨d, hd, hd0⟩ := this
   exact ⟨0, ⟨d, hd⟩, fun h ↦ hd0 <| Subtype.ext_iff.1 h.symm⟩
 

@@ -33,7 +33,7 @@ def prod_of_Iic (f : Iic k → T) : (Fin (k (last n) + 1)) → (Iic (init k)) �
   refine mem_Iic.2 (fun j ↦ ?_)
   by_cases h : j = last _
   · simp [h]; omega
-  · simp only [h, if_false]
+  · simp only [h]
     change Nat.le (i.1 (castPred j h)) (k j)
     have hi := le_def.1 (mem_Iic.1 i.2) (castPred j h)
     change Nat.le (i.1 (castPred j h)) (init k (castPred j h)) at hi
@@ -55,7 +55,7 @@ def Iic_equiv : Fin (k (last n) + 1) × (Iic (init k)) ≃ (Iic k) where
     refine mem_Iic.2 (fun j ↦ ?_)
     by_cases h : j = last _
     · simp [h]; omega
-    · simp only [h, if_false]
+    · simp only [h]
       change Nat.le (p.2.1 (castPred j h)) (k j)
       have hi := le_def.1 (mem_Iic.1 p.2.2) (castPred j h)
       change Nat.le (p.2.1 (castPred j h)) (init k (castPred j h)) at hi
