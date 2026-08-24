@@ -34,27 +34,48 @@ theorem taylor_two [Invertible (2 : R)] (f : R → R) (x : R) (δ : 𝔻 R 2) :
   simp [((cancel_d (fun _ ↦ cancel_d (fun _ ↦ this _ _))).symm : ∂∂f x = b 1 * 2), mul_assoc,
     mul_comm ((δ : R) ^ 2)]
 
+/-- A direct nonzero criterion for natural-number casts into `ℚ`, avoiding generic `CharZero`
+instance machinery. -/
+lemma rat_natCast_ne_zero {n : ℕ} (hn : n ≠ 0) : (n : ℚ) ≠ 0 := by
+  intro h
+  apply hn
+  apply Rat.natCast_injective
+  simpa only [Nat.cast_zero] using h
+
 open Nat in
 lemma inv_factorial_smul_succ_iff {R : Type*} [CommRing R] [Algebra ℚ R] {n : ℕ} {x y : R} :
     (n ! : ℚ)⁻¹ • y = ((n + 1)! : ℚ)⁻¹ • x ↔ x = (n + 1) * y := by
-  have hfact : (n ! : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_pos n).ne'
-  have hn1 : (↑(n + 1) : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.succ_ne_zero n)
-  refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
-  · have h' : x = ((n + 1)! : ℚ) • (n ! : ℚ)⁻¹ • y :=
-      calc x = ((n + 1)! : ℚ) • ((n + 1)! : ℚ)⁻¹ • x := by
-               rw [smul_smul, mul_inv_cancel₀ (cast_ne_zero.mpr (factorial_pos _).ne'), one_smul]
-           _ = _:= by rw [h]
-    rw [h', smul_smul, factorial_succ, Nat.cast_mul, mul_assoc, mul_inv_cancel₀ hfact, mul_one,
-      Algebra.smul_def, map_natCast]
-    norm_cast
-  · rw [h, show (↑n + 1 : R) * y = (↑(n + 1) : ℚ) • y by simp [Algebra.smul_def], smul_smul,
-      factorial_succ, Nat.cast_mul, mul_inv_rev, mul_assoc, inv_mul_cancel₀ hn1, mul_one]
+  have hfact : (n ! : ℚ) ≠ 0 := rat_natCast_ne_zero (factorial_ne_zero n)
+  have hsuccfact : ((n + 1)! : ℚ) ≠ 0 := rat_natCast_ne_zero (factorial_ne_zero (n + 1))
+  have hn1 : (n + 1 : ℚ) ≠ 0 := rat_natCast_ne_zero (Nat.succ_ne_zero n)
+  have hfac : ((n + 1)! : ℚ) = (n + 1 : ℚ) * (n ! : ℚ) := by
+    rw [factorial_succ, Nat.cast_mul]
+  have hstep : (n + 1 : ℚ) • y = (n + 1 : R) * y := by
+    rw [Algebra.smul_def, map_natCast]
+  constructor
+  · intro h
+    have h' := congrArg (fun z : R ↦ ((n + 1)! : ℚ) • z) h
+    rw [smul_smul, smul_smul] at h'
+    have hleft : ((n + 1)! : ℚ) * (n ! : ℚ)⁻¹ = (n + 1 : ℚ) := by
+      rw [hfac, mul_assoc, mul_inv_cancel₀ hfact, mul_one]
+    have hright : ((n + 1)! : ℚ) * ((n + 1)! : ℚ)⁻¹ = 1 :=
+      mul_inv_cancel₀ hsuccfact
+    rw [hleft, hright, one_smul] at h'
+    exact h'.symm.trans hstep
+  · intro h
+    have hx : x = (n + 1 : ℚ) • y := h.trans hstep.symm
+    rw [hx, smul_smul]
+    have hscalar : ((n + 1)! : ℚ)⁻¹ * (n + 1 : ℚ) = (n ! : ℚ)⁻¹ := by
+      rw [hfac, mul_inv_rev, mul_assoc, inv_mul_cancel₀ hn1, mul_one]
+    rw [hscalar]
 
 /-- `(n : ℚ)⁻¹ • (n : R) = 1` for `n ≠ 0`, via the algebra map. -/
 lemma inv_natCast_smul_natCast {R : Type*} [CommRing R] [Algebra ℚ R] {n : ℕ}
     (hn : n ≠ 0) : (n : ℚ)⁻¹ • (n : R) = 1 := by
-  rw [Algebra.smul_def, ← map_natCast (algebraMap ℚ R) n, ← map_mul, inv_mul_cancel₀
-    (Nat.cast_ne_zero.2 hn), map_one]
+  have hnq : (n : ℚ) ≠ 0 := rat_natCast_ne_zero hn
+  have hcast : (n : ℚ) • (1 : R) = (n : R) := by
+    rw [Algebra.smul_def, map_natCast, mul_one]
+  rw [← hcast, smul_smul, inv_mul_cancel₀ hnq, one_smul]
 
 theorem taylor_k_aux {k : ℕ} [Algebra ℚ R] (f : R → R) (x : R) (d : Fin k → D R) :
     letI δ : R := ∑ n, d n
@@ -142,7 +163,7 @@ theorem taylor_k_aux' [Algebra ℚ R] (k : ℕ) (f : R → R) (x : R) (b : Fin (
     rw [← this, mul_assoc]
     congr
     rw [Algebra.smul_def, ← mul_assoc, ← map_natCast (algebraMap ℚ R), ← map_mul,
-        mul_inv_cancel₀ (Nat.cast_ne_zero.mpr (factorial_ne_zero _)), map_one, one_mul]
+        mul_inv_cancel₀ (rat_natCast_ne_zero (factorial_ne_zero _)), map_one, one_mul]
 decreasing_by rw [Fin.sizeOf, Fin.sizeOf, Nat.succ_lt_succ_iff]
               exact succ_le_succ j.2
 
@@ -160,6 +181,6 @@ theorem taylor_k [Algebra ℚ R] (f : R → R) (x : R) : ∀ (k : ℕ) (δ : �
   rw [← taylor_k_aux' k f x b (fun d ↦ hb _ d.2), mul_assoc]
   congr
   rw [Algebra.smul_def, ← mul_assoc, ← map_natCast (algebraMap ℚ R), ← map_mul,
-      mul_inv_cancel₀ (Nat.cast_ne_zero.mpr (factorial_ne_zero _)), map_one, one_mul, val_succ]
+      mul_inv_cancel₀ (rat_natCast_ne_zero (factorial_ne_zero _)), map_one, one_mul, val_succ]
 
 end SDG
