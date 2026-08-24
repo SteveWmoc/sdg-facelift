@@ -6,6 +6,7 @@ public import Mathlib.Data.Nat.Factorial.Basic
 public import Mathlib.Algebra.BigOperators.Fin
 
 public import SDG.Basic.Defs
+public import SDG.ForMathlib.FinChoiceFree
 
 /-!
 # Lemmas about nilpotent subsemigroups
@@ -68,11 +69,12 @@ lemma mem_D_sum_pow_succ : ∀ {k : ℕ} (b : Fin k → D R), (∑ i, (b i : R))
     mem_D_sum_pow_succ, zero_mul]
 
 open Nat in
-lemma mem_D_sum_pow : ∀ {k : ℕ} (b : Fin k → D R), (∑ i, (b i : R)) ^ k = (k ! : R) * ∏ i, (b i).1
+lemma mem_D_sum_pow : ∀ {k : ℕ} (b : Fin k → D R),
+    (∑ i, (b i : R)) ^ k = (k ! : R) * FinChoiceFree.prod k (fun i => (b i).1)
 | 0 => by simp
 | k + 1 => fun b ↦ by
   rw [Fin.sum_univ_succ, mem_D_add_pow, mem_D_sum_pow_succ, add_zero, mem_D_sum_pow,
-    Fin.prod_univ_succ, factorial_succ, cast_mul]
+    FinChoiceFree.prod_succ, factorial_succ, cast_mul]
   ring
 
 lemma D_add_sq_dvd_two [Invertible (2 : R)] (d₁ d₂ : D R) :
