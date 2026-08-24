@@ -9,6 +9,23 @@ Temporary diagnostic module for tracing where `Classical.choice` enters the SDG 
 The `#print axioms` commands below deliberately print kernel axiom dependencies in CI logs.
 -/
 
+namespace SDG.Axiom
+
+/-- A primitive-recursive product over `Fin n`, avoiding `Fintype`/`Finset` big-operator machinery. -/
+def finProd {M : Type*} [Monoid M] : (n : ℕ) → (Fin n → M) → M
+  | 0, _ => 1
+  | n + 1, f => f 0 * finProd n (fun i => f i.succ)
+
+/-- Prepending `1` does not change the primitive-recursive finite product. -/
+theorem finProd_cons_one {M : Type*} [Monoid M] {n : ℕ} (f : Fin n → M) :
+    finProd (n + 1) (Fin.cons 1 f) = finProd n f := by
+  simp [finProd]
+
+end SDG.Axiom
+
+#print axioms SDG.Axiom.finProd
+#print axioms SDG.Axiom.finProd_cons_one
+
 #print axioms Fin.prod_univ_succAbove
 #print axioms Fin.prod_univ_succ
 #print axioms Fin.prod_univ_castSucc
