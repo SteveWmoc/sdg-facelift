@@ -17,6 +17,11 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms Fin.prod_univ_add
 #print axioms Fintype.prod_equiv
 
+#print axioms Fin.prod_ofFn
+#print axioms Fin.prod_univ_def
+#print axioms Fin.prod_univ_zero
+#print axioms Finset.prod_eq_one
+
 #print axioms Fin.prod_cons_one
 #print axioms Fin.sum_cons_zero
 #print axioms Fin.prod_castLE_of_eq_one
