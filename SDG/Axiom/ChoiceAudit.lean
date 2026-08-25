@@ -44,6 +44,9 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms Fin.sum_castLE_of_eq_zero
 
 #print axioms SDG.IsKockLawvere
+#print axioms SDG.IsKockLawvere.isKockLawvere_choiceFree
+#print axioms SDG.IsKockLawvere.isKockLawvere
+#print axioms SDG.instIsKockLawvere_oneOfIsKockLawvere
 #print axioms SDG.cancel_d
 #print axioms SDG.cancel_d_fun
 #print axioms SDG.mem_D_sum_pow_succ
