@@ -39,11 +39,17 @@ theorem inv_mul_cancel {K : Type*} [hK : Field K] {a : K} (ha : a ≠ 0) :
   rw [mul_comm]
   exact mul_inv_cancel ha
 
+/-- Cancel a nonzero right factor without inferring a `GroupWithZero` or cancellation instance. -/
+theorem mul_right_cancel {K : Type*} [Field K] {a b c : K} (hc : c ≠ 0)
+    (h : a * c = b * c) : a = b := by
+  have h' := congrArg (fun z : K ↦ z * inv c) h
+  simpa only [mul_assoc, mul_inv_cancel hc, mul_one] using h'
+
+/-- Cancel a nonzero left factor without inferring a `GroupWithZero` or cancellation instance. -/
+theorem mul_left_cancel {K : Type*} [Field K] {a b c : K} (ha : a ≠ 0)
+    (h : a * b = a * c) : b = c := by
+  rw [mul_comm a b, mul_comm a c] at h
+  exact mul_right_cancel ha h
+
 end FieldChoiceFree
 end SDG
-
--- Temporary audit output while the compatibility layer is being established.
-#print axioms SDG.FieldChoiceFree.divisionRingInv
-#print axioms SDG.FieldChoiceFree.inv
-#print axioms SDG.FieldChoiceFree.mul_inv_cancel
-#print axioms SDG.FieldChoiceFree.inv_mul_cancel
