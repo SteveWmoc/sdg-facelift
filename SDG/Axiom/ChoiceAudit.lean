@@ -106,6 +106,11 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms Rat.intCast_eq_divInt
 #print axioms Rat.divInt_one_one
 
+-- Direct parent projections in the inverse hierarchy.
+#print axioms DivInvMonoid.toInv
+#print axioms DivisionRing.toDivInvMonoid
+#print axioms Field.toDivisionRing
+
 namespace SDG.Axiom
 
 theorem ratInv_refl (q : ℚ) : q⁻¹ = q⁻¹ := rfl
@@ -145,6 +150,16 @@ theorem divisionRingInv_refl {K : Type*} [DivisionRing K] (q : K) : q⁻¹ = q�
 
 theorem fieldExplicitInv_refl {K : Type*} [Field K] [Inv K] (q : K) : q⁻¹ = q⁻¹ := rfl
 
+-- Force the direct parent projection instead of asking typeclass search to forget structure.
+theorem divisionRingDirectDivInv_refl {K : Type*} [hK : DivisionRing K] (q : K) : q⁻¹ = q⁻¹ := by
+  letI : DivInvMonoid K := hK.toDivInvMonoid
+  rfl
+
+theorem fieldDirectDivInv_refl {K : Type*} [hK : Field K] (q : K) : q⁻¹ = q⁻¹ := by
+  letI : DivisionRing K := hK.toDivisionRing
+  letI : DivInvMonoid K := (inferInstance : DivisionRing K).toDivInvMonoid
+  rfl
+
 end SDG.Axiom
 
 #print axioms SDG.Axiom.ratInv_refl
@@ -160,6 +175,8 @@ end SDG.Axiom
 #print axioms SDG.Axiom.divInvMonoidInv_refl
 #print axioms SDG.Axiom.divisionRingInv_refl
 #print axioms SDG.Axiom.fieldExplicitInv_refl
+#print axioms SDG.Axiom.divisionRingDirectDivInv_refl
+#print axioms SDG.Axiom.fieldDirectDivInv_refl
 
 #print axioms SDG.rat_natCast_ne_zero
 #print axioms SDG.inv_factorial_algebraMap_mul_succ_iff
