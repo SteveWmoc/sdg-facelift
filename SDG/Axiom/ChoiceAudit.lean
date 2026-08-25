@@ -74,6 +74,31 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms Rat.instField
 #print axioms Rat.instDivisionRing
 
+-- Second-layer probes for the construction of `Rat.commRing`.
+#print axioms Rat.addCommGroup
+#print axioms Rat.commMonoid
+#print axioms Rat.zero_add
+#print axioms Rat.add_zero
+#print axioms Rat.add_comm
+#print axioms Rat.add_assoc
+#print axioms Rat.neg_add_cancel
+#print axioms Rat.sub_eq_add_neg
+#print axioms Rat.zero_mul
+#print axioms Rat.mul_zero
+#print axioms Rat.mul_one
+#print axioms Rat.one_mul
+#print axioms Rat.mul_comm
+#print axioms Rat.mul_assoc
+#print axioms Rat.mul_add
+#print axioms Rat.add_mul
+#print axioms Rat.intCast_add
+#print axioms Rat.intCast_one
+#print axioms Rat.pow_zero
+#print axioms Rat.pow_succ
+#print axioms Rat.divInt_add_divInt
+#print axioms Rat.intCast_eq_divInt
+#print axioms Rat.divInt_one_one
+
 namespace SDG.Axiom
 
 theorem ratInv_refl (q : ℚ) : q⁻¹ = q⁻¹ := rfl
