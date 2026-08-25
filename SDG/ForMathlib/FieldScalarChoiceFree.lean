@@ -58,3 +58,7 @@ theorem inv_natCast_algebraMap_mul_natCast {K R : Type*} [Field K] [CharZero K]
 
 end FieldChoiceFree
 end SDG
+
+-- Temporary audit output while the scalar compatibility layer is being established.
+#print axioms SDG.FieldChoiceFree.inv_factorial_algebraMap_mul_succ_iff
+#print axioms SDG.FieldChoiceFree.inv_natCast_algebraMap_mul_natCast
