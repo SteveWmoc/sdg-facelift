@@ -6,7 +6,7 @@ public import Mathlib.Algebra.Field.Defs
 # Choice-free access to field inverse data
 
 The standard forgetful typeclass path from `Field K` to `Inv K` currently carries a
-`Classical.choice` dependency.  The inverse operation itself is already data stored in the field
+`Classical.choice` dependency. The inverse operation itself is already data stored in the field
 structure, so this module exposes it by explicit structure projection instead of asking typeclass
 inference to recover `Inv K`.
 
@@ -41,3 +41,9 @@ theorem inv_mul_cancel {K : Type*} [hK : Field K] {a : K} (ha : a ≠ 0) :
 
 end FieldChoiceFree
 end SDG
+
+-- Temporary audit output while the compatibility layer is being established.
+#print axioms SDG.FieldChoiceFree.divisionRingInv
+#print axioms SDG.FieldChoiceFree.inv
+#print axioms SDG.FieldChoiceFree.mul_inv_cancel
+#print axioms SDG.FieldChoiceFree.inv_mul_cancel
