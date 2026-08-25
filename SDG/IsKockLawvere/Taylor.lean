@@ -109,7 +109,8 @@ match k with
     rw [hδΔ, mem_D_add_pow, mem_D_univ_sum_pow_succ, add_zero,
       mul_comm (↑(k + 1) : R), mul_assoc, mul_comm (↑(k + 1) : R)]
     congr
-    rw [Algebra.smul_def]
+    simp only [Algebra.smul_def]
+    rw [mul_assoc]
     apply (inv_factorial_algebraMap_mul_succ_iff (R := R)).2
     ring
   obtain ⟨m, hm⟩ := eq_succ_of_ne_zero h
@@ -123,7 +124,7 @@ match k with
   congr
   rw [← mul_assoc, ← smul_mul_assoc]
   congr 1
-  rw [Algebra.smul_def]
+  simp only [Algebra.smul_def]
   apply (inv_factorial_algebraMap_mul_succ_iff (R := R)).2
   ring
 
