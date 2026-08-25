@@ -112,6 +112,7 @@ match k with
     simp only [Algebra.smul_def]
     rw [mul_assoc]
     apply (inv_factorial_algebraMap_mul_succ_iff (R := R)).2
+    rw [Nat.cast_add, Nat.cast_one]
     ring
   obtain ⟨m, hm⟩ := eq_succ_of_ne_zero h
   simp only [succ_eq_add_one, snoc_castSucc, val_succ, Function.iterate_succ,
@@ -126,6 +127,7 @@ match k with
   congr 1
   simp only [Algebra.smul_def]
   apply (inv_factorial_algebraMap_mul_succ_iff (R := R)).2
+  rw [Nat.cast_add, Nat.cast_one]
   ring
 
 theorem taylor_k_aux_zero (k : ℕ) (f : R → R) (x : R) (B : Fin (k + 1) → R)
