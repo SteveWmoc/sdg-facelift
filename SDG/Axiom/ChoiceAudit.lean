@@ -135,6 +135,16 @@ theorem genericNatCastMapMul_refl
     {K R : Type*} [Field K] [CharZero K] [CommRing R] [Algebra K R] (n : ℕ) :
     algebraMap K R ((n : K)⁻¹) * (n : R) = algebraMap K R ((n : K)⁻¹) * (n : R) := rfl
 
+-- Inverse hierarchy controls. `DivInvMonoid` contains `Inv` as data, so these probes determine
+-- whether choice enters when typeclass inference forgets increasingly rich structures down to `Inv`.
+theorem explicitInv_refl {K : Type*} [Inv K] (q : K) : q⁻¹ = q⁻¹ := rfl
+
+theorem divInvMonoidInv_refl {K : Type*} [DivInvMonoid K] (q : K) : q⁻¹ = q⁻¹ := rfl
+
+theorem divisionRingInv_refl {K : Type*} [DivisionRing K] (q : K) : q⁻¹ = q⁻¹ := rfl
+
+theorem fieldExplicitInv_refl {K : Type*} [Field K] [Inv K] (q : K) : q⁻¹ = q⁻¹ := rfl
+
 end SDG.Axiom
 
 #print axioms SDG.Axiom.ratInv_refl
@@ -146,6 +156,10 @@ end SDG.Axiom
 #print axioms SDG.Axiom.genericInv_refl
 #print axioms SDG.Axiom.genericInvMapMul_refl
 #print axioms SDG.Axiom.genericNatCastMapMul_refl
+#print axioms SDG.Axiom.explicitInv_refl
+#print axioms SDG.Axiom.divInvMonoidInv_refl
+#print axioms SDG.Axiom.divisionRingInv_refl
+#print axioms SDG.Axiom.fieldExplicitInv_refl
 
 #print axioms SDG.rat_natCast_ne_zero
 #print axioms SDG.inv_factorial_algebraMap_mul_succ_iff
