@@ -41,9 +41,9 @@ lemma rat_natCast_ne_zero {n : ℕ} (hn : n ≠ 0) : (n : ℚ) ≠ 0 := by
     simpa only [Rat.num_natCast, Rat.num_zero] using congrArg Rat.num h
   exact hn (Int.ofNat.inj hnum)
 
+open Nat in
 /-- The factorial-scalar step, stated through `algebraMap` to avoid the standard scalar-action
 instance on an arbitrary `ℚ`-algebra. -/
-open Nat in
 lemma inv_factorial_algebraMap_mul_succ_iff {R : Type*} [CommRing R] [Algebra ℚ R]
     {n : ℕ} {x y : R} :
     algebraMap ℚ R ((n ! : ℚ)⁻¹) * y = algebraMap ℚ R (((n + 1)! : ℚ)⁻¹) * x ↔
@@ -58,7 +58,7 @@ lemma inv_factorial_algebraMap_mul_succ_iff {R : Type*} [CommRing R] [Algebra �
   constructor
   · intro h
     have h' := congrArg (fun z : R ↦ algebraMap ℚ R ((n + 1)! : ℚ) * z) h
-    rw [mul_assoc, mul_assoc, ← map_mul, ← map_mul] at h'
+    rw [← mul_assoc, ← mul_assoc, ← map_mul, ← map_mul] at h'
     have hleft : ((n + 1)! : ℚ) * (n ! : ℚ)⁻¹ = (↑(n + 1) : ℚ) := by
       rw [hfac, mul_assoc, mul_inv_cancel₀ hfact, mul_one]
     have hright : ((n + 1)! : ℚ) * ((n + 1)! : ℚ)⁻¹ = 1 :=
@@ -109,7 +109,8 @@ match k with
     rw [hδΔ, mem_D_add_pow, mem_D_univ_sum_pow_succ, add_zero,
       mul_comm (↑(k + 1) : R), mul_assoc, mul_comm (↑(k + 1) : R)]
     congr
-    simp [Algebra.smul_def, inv_factorial_algebraMap_mul_succ_iff]
+    rw [Algebra.smul_def]
+    apply (inv_factorial_algebraMap_mul_succ_iff (R := R)).2
     ring
   obtain ⟨m, hm⟩ := eq_succ_of_ne_zero h
   simp only [succ_eq_add_one, snoc_castSucc, val_succ, Function.iterate_succ,
@@ -122,7 +123,8 @@ match k with
   congr
   rw [← mul_assoc, ← smul_mul_assoc]
   congr 1
-  simp [Algebra.smul_def, inv_factorial_algebraMap_mul_succ_iff]
+  rw [Algebra.smul_def]
+  apply (inv_factorial_algebraMap_mul_succ_iff (R := R)).2
   ring
 
 theorem taylor_k_aux_zero (k : ℕ) (f : R → R) (x : R) (B : Fin (k + 1) → R)
