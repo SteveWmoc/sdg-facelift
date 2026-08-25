@@ -78,6 +78,8 @@ namespace SDG.Axiom
 
 theorem ratInv_refl (q : ℚ) : q⁻¹ = q⁻¹ := rfl
 
+theorem ratAlgebra_true {R : Type*} [CommRing R] [Algebra ℚ R] : True := True.intro
+
 theorem ratInvSmul_refl {R : Type*} [CommRing R] [Algebra ℚ R] (q : ℚ) (x : R) :
     q⁻¹ • x = q⁻¹ • x := rfl
 
@@ -87,6 +89,7 @@ theorem ratInvMapMul_refl {R : Type*} [CommRing R] [Algebra ℚ R] (q : ℚ) (x 
 end SDG.Axiom
 
 #print axioms SDG.Axiom.ratInv_refl
+#print axioms SDG.Axiom.ratAlgebra_true
 #print axioms SDG.Axiom.ratInvSmul_refl
 #print axioms SDG.Axiom.ratInvMapMul_refl
 
