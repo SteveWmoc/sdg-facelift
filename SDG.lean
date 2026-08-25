@@ -6,6 +6,7 @@ public import SDG.Axiom.Instances
 public import SDG.Axiom.UniqueChoice
 public import SDG.Basic.D
 public import SDG.Basic.Defs
+public import SDG.ForMathlib.FieldChoiceFree
 public import SDG.ForMathlib.Fin
 public import SDG.ForMathlib.FinChoiceFree
 public import SDG.ForMathlib.PiIic
