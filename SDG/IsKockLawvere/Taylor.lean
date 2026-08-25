@@ -41,45 +41,46 @@ lemma rat_natCast_ne_zero {n : ℕ} (hn : n ≠ 0) : (n : ℚ) ≠ 0 := by
     simpa only [Rat.num_natCast, Rat.num_zero] using congrArg Rat.num h
   exact hn (Int.ofNat.inj hnum)
 
+/-- The factorial-scalar step, stated through `algebraMap` to avoid the standard scalar-action
+instance on an arbitrary `ℚ`-algebra. -/
 open Nat in
-lemma inv_factorial_smul_succ_iff {R : Type*} [CommRing R] [Algebra ℚ R] {n : ℕ} {x y : R} :
-    (n ! : ℚ)⁻¹ • y = ((n + 1)! : ℚ)⁻¹ • x ↔ x = (n + 1) * y := by
+lemma inv_factorial_algebraMap_mul_succ_iff {R : Type*} [CommRing R] [Algebra ℚ R]
+    {n : ℕ} {x y : R} :
+    algebraMap ℚ R ((n ! : ℚ)⁻¹) * y = algebraMap ℚ R (((n + 1)! : ℚ)⁻¹) * x ↔
+      x = (n + 1) * y := by
   have hfact : (n ! : ℚ) ≠ 0 := rat_natCast_ne_zero (factorial_ne_zero n)
   have hsuccfact : ((n + 1)! : ℚ) ≠ 0 := rat_natCast_ne_zero (factorial_ne_zero (n + 1))
   have hn1 : (↑(n + 1) : ℚ) ≠ 0 := rat_natCast_ne_zero (Nat.succ_ne_zero n)
   have hfac : ((n + 1)! : ℚ) = (↑(n + 1) : ℚ) * (n ! : ℚ) := by
     rw [factorial_succ, Nat.cast_mul]
-  have hstep : (↑(n + 1) : ℚ) • y = (↑(n + 1) : R) * y := by
-    rw [Algebra.smul_def, map_natCast]
+  have hstep : algebraMap ℚ R (↑(n + 1) : ℚ) = (↑(n + 1) : R) := by
+    rw [map_natCast]
   constructor
   · intro h
-    have h' := congrArg (fun z : R ↦ ((n + 1)! : ℚ) • z) h
-    rw [smul_smul, smul_smul] at h'
+    have h' := congrArg (fun z : R ↦ algebraMap ℚ R ((n + 1)! : ℚ) * z) h
+    rw [mul_assoc, mul_assoc, ← map_mul, ← map_mul] at h'
     have hleft : ((n + 1)! : ℚ) * (n ! : ℚ)⁻¹ = (↑(n + 1) : ℚ) := by
       rw [hfac, mul_assoc, mul_inv_cancel₀ hfact, mul_one]
     have hright : ((n + 1)! : ℚ) * ((n + 1)! : ℚ)⁻¹ = 1 :=
       mul_inv_cancel₀ hsuccfact
-    rw [hleft, hright, one_smul] at h'
+    rw [hleft, hright, map_one, one_mul] at h'
     calc
-      x = (↑(n + 1) : ℚ) • y := h'.symm
-      _ = (↑(n + 1) : R) * y := hstep
+      x = algebraMap ℚ R (↑(n + 1) : ℚ) * y := h'.symm
+      _ = (↑(n + 1) : R) * y := by rw [hstep]
       _ = (n + 1) * y := by rw [Nat.cast_succ]
   · intro h
     have hxR : x = (↑(n + 1) : R) * y := by
       simpa only [Nat.cast_succ] using h
-    have hx : x = (↑(n + 1) : ℚ) • y := hxR.trans hstep.symm
-    rw [hx, smul_smul]
     have hscalar : ((n + 1)! : ℚ)⁻¹ * (↑(n + 1) : ℚ) = (n ! : ℚ)⁻¹ := by
       rw [hfac, mul_inv_rev, mul_assoc, inv_mul_cancel₀ hn1, mul_one]
-    rw [hscalar]
+    rw [hxR, ← hstep, ← mul_assoc, ← map_mul, hscalar]
 
-/-- `(n : ℚ)⁻¹ • (n : R) = 1` for `n ≠ 0`, via the algebra map. -/
-lemma inv_natCast_smul_natCast {R : Type*} [CommRing R] [Algebra ℚ R] {n : ℕ}
-    (hn : n ≠ 0) : (n : ℚ)⁻¹ • (n : R) = 1 := by
+/-- The inverse natural-cast cancellation, stated through `algebraMap` rather than `ℚ`-scalar
+multiplication. -/
+lemma inv_natCast_algebraMap_mul_natCast {R : Type*} [CommRing R] [Algebra ℚ R] {n : ℕ}
+    (hn : n ≠ 0) : algebraMap ℚ R ((n : ℚ)⁻¹) * (n : R) = 1 := by
   have hnq : (n : ℚ) ≠ 0 := rat_natCast_ne_zero hn
-  have hcast : (n : ℚ) • (1 : R) = (n : R) := by
-    rw [Algebra.smul_def, map_natCast, mul_one]
-  rw [← hcast, smul_smul, inv_mul_cancel₀ hnq, one_smul]
+  rw [← map_natCast (algebraMap ℚ R), ← map_mul, inv_mul_cancel₀ hnq, map_one]
 
 theorem taylor_k_aux {k : ℕ} [Algebra ℚ R] (f : R → R) (x : R) (d : Fin k → D R) :
     letI δ : R := ∑ n, d n
@@ -108,23 +109,25 @@ match k with
     rw [hδΔ, mem_D_add_pow, mem_D_univ_sum_pow_succ, add_zero,
       mul_comm (↑(k + 1) : R), mul_assoc, mul_comm (↑(k + 1) : R)]
     congr
-    simp [inv_factorial_smul_succ_iff]
+    simp [Algebra.smul_def, inv_factorial_algebraMap_mul_succ_iff]
     ring
   obtain ⟨m, hm⟩ := eq_succ_of_ne_zero h
   simp only [succ_eq_add_one, snoc_castSucc, val_succ, Function.iterate_succ,
     Function.comp_apply, val_castSucc]
   simp only [hm, cons_succ, mul_assoc, ← val_castSucc m', ← Function.iterate_succ_apply,
     val_succ, ← mul_add]
-  rw [hδΔ, mem_D_add_pow, pow_succ, mul_comm _ (δ ^ m.1), ← mul_add, mul_comm (↑(m.1 + 1) : R),
-    mul_add (δ ^ m.1), add_comm (δ ^ m.1 * _), smul_add, mul_comm (d 0).1]
+  rw [hδΔ, mem_D_add_pow, pow_succ, mul_comm _ (δ ^ m.1), ← mul_add,
+    mul_comm (↑(m.1 + 1) : R), mul_add (δ ^ m.1), add_comm (δ ^ m.1 * _), smul_add,
+    mul_comm (d 0).1]
   congr
   rw [← mul_assoc, ← smul_mul_assoc]
   congr 1
-  simp [inv_factorial_smul_succ_iff]
+  simp [Algebra.smul_def, inv_factorial_algebraMap_mul_succ_iff]
   ring
 
 theorem taylor_k_aux_zero (k : ℕ) (f : R → R) (x : R) (B : Fin (k + 1) → R)
-    (hB : ∀ (d : (𝔻 R (k + 1))), f (x + d) = f x + ∑ i, B i * d ^ (i.1 + 1)) : B 0 = ∂f x := by
+    (hB : ∀ (d : (𝔻 R (k + 1))), f (x + d) = f x + ∑ i, B i * d ^ (i.1 + 1)) :
+    B 0 = ∂f x := by
   refine (derivative_unique (fun d ↦ ?_)).symm
   rw [hB ⟨d, 𝔻_le (Nat.le_add_left ..) d.2⟩, add_right_inj, sum_univ_succ]
   convert add_zero _
@@ -155,8 +158,9 @@ theorem taylor_k_aux' [Algebra ℚ R] (k : ℕ) (f : R → R) (x : R) (b : Fin (
   · simp only [succ_eq_add_one, succ_mk, Function.iterate_succ, Function.comp_apply]
     simp only [succ_last, succ_eq_add_one, val_last, Function.iterate_succ,
       Function.comp_apply, val_succ, val_castLE] at Hb
-    rw [mem_D_univ_sum_pow d, mul_comm ((n + 2)! : R), mul_comm _ ((n + 2)! : R), ← smul_mul_assoc,
-      inv_natCast_smul_natCast (factorial_ne_zero _), one_mul] at Hb
+    rw [mem_D_univ_sum_pow d, mul_comm ((n + 2)! : R), mul_comm _ ((n + 2)! : R),
+      ← smul_mul_assoc, Algebra.smul_def,
+      inv_natCast_algebraMap_mul_natCast (factorial_ne_zero _), one_mul] at Hb
     exact Hb ▸ mul_assoc ..
   · congr
     ext j
