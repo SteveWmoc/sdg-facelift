@@ -46,7 +46,7 @@ theorem inv_factorial_algebraMap_mul_succ_iff {K R : Type*} [Field K] [CharZero 
       simpa only [Nat.cast_succ] using h
     have hscalar : inv ((n + 1)! : K) * (↑(n + 1) : K) = inv (n ! : K) := by
       apply mul_right_cancel hfact
-      rw [← mul_assoc, ← hfac, inv_mul_cancel hsuccfact, inv_mul_cancel hfact]
+      rw [mul_assoc, ← hfac, inv_mul_cancel hsuccfact, inv_mul_cancel hfact]
     rw [hxR, ← hstep, ← mul_assoc, ← map_mul, hscalar]
 
 /-- Cancellation of an inverse natural-number scalar after applying an algebra map. -/
