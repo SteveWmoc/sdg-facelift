@@ -71,9 +71,9 @@ namespace IsKockLawvere
 
 /-- Compatibility bridge from the choice-free Kock-Lawvere class field to Mathlib's generic
 finite sum. This theorem intentionally inherits the axiom dependencies of the generic big operator. -/
-theorem isKockLawvere [IsKockLawvere R] : ∀ k, ∀ g : 𝔻 R k → R,
+theorem isKockLawvere {R : Type*} [CommRing R] [IsKockLawvere R]
+    (k : ℕ) (g : 𝔻 R k → R) :
     ∃! b : Fin k → R, ∀ d, g d = g 0 + ∑ i, b i * d ^ (i.val + 1) := by
-  intro k g
   obtain ⟨b, hb, hbunique⟩ := IsKockLawvere.isKockLawvere_choiceFree k g
   refine ⟨b, ?_, ?_⟩
   · intro d
