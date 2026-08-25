@@ -160,6 +160,30 @@ theorem fieldDirectDivInv_refl {K : Type*} [hK : Field K] (q : K) : q⁻¹ = q�
   letI : DivInvMonoid K := (inferInstance : DivisionRing K).toDivInvMonoid
   rfl
 
+-- Stronger bypass: name the inverse operation by explicit structure projections, so the theorem
+-- statement itself never asks typeclass search for an `Inv K` instance.
+def divisionRingChoiceFreeInv {K : Type*} [hK : DivisionRing K] : K → K :=
+  hK.toDivInvMonoid.toInv.inv
+
+def fieldChoiceFreeInv {K : Type*} [hK : Field K] : K → K :=
+  hK.toDivisionRing.toDivInvMonoid.toInv.inv
+
+theorem divisionRingChoiceFreeInv_refl {K : Type*} [DivisionRing K] (q : K) :
+    divisionRingChoiceFreeInv q = divisionRingChoiceFreeInv q := rfl
+
+theorem fieldChoiceFreeInv_refl {K : Type*} [Field K] (q : K) :
+    fieldChoiceFreeInv q = fieldChoiceFreeInv q := rfl
+
+theorem fieldChoiceFreeInvMapMul_refl
+    {K R : Type*} [Field K] [CharZero K] [CommRing R] [Algebra K R] (q : K) (x : R) :
+    algebraMap K R (fieldChoiceFreeInv q) * x =
+      algebraMap K R (fieldChoiceFreeInv q) * x := rfl
+
+theorem fieldChoiceFreeNatCastMapMul_refl
+    {K R : Type*} [Field K] [CharZero K] [CommRing R] [Algebra K R] (n : ℕ) :
+    algebraMap K R (fieldChoiceFreeInv (n : K)) * (n : R) =
+      algebraMap K R (fieldChoiceFreeInv (n : K)) * (n : R) := rfl
+
 end SDG.Axiom
 
 #print axioms SDG.Axiom.ratInv_refl
@@ -177,6 +201,12 @@ end SDG.Axiom
 #print axioms SDG.Axiom.fieldExplicitInv_refl
 #print axioms SDG.Axiom.divisionRingDirectDivInv_refl
 #print axioms SDG.Axiom.fieldDirectDivInv_refl
+#print axioms SDG.Axiom.divisionRingChoiceFreeInv
+#print axioms SDG.Axiom.fieldChoiceFreeInv
+#print axioms SDG.Axiom.divisionRingChoiceFreeInv_refl
+#print axioms SDG.Axiom.fieldChoiceFreeInv_refl
+#print axioms SDG.Axiom.fieldChoiceFreeInvMapMul_refl
+#print axioms SDG.Axiom.fieldChoiceFreeNatCastMapMul_refl
 
 #print axioms SDG.rat_natCast_ne_zero
 #print axioms SDG.inv_factorial_algebraMap_mul_succ_iff
