@@ -68,6 +68,13 @@ The `#print axioms` commands below deliberately print kernel axiom dependencies 
 #print axioms smul_smul
 #print axioms one_smul
 
+-- Generic arithmetic lemmas used by the scalar proofs but not covered above.
+#print axioms Nat.factorial_ne_zero
+#print axioms Nat.factorial_succ
+#print axioms Nat.cast_succ
+#print axioms Nat.cast_add
+#print axioms Nat.cast_one
+
 -- Concrete rational structure dictionaries and statement-only scalar probes.
 #print axioms Rat.commRing
 #print axioms Rat.commGroupWithZero
@@ -111,12 +118,34 @@ theorem ratInvSmul_refl {R : Type*} [CommRing R] [Algebra ℚ R] (q : ℚ) (x : 
 theorem ratInvMapMul_refl {R : Type*} [CommRing R] [Algebra ℚ R] (q : ℚ) (x : R) :
     algebraMap ℚ R q⁻¹ * x = algebraMap ℚ R q⁻¹ * x := rfl
 
+-- Parametric controls: these distinguish proof-level contamination from dependencies already present
+-- in generic field/algebra statements.
+theorem genericField_true {K : Type*} [Field K] [CharZero K] : True := True.intro
+
+theorem genericAlgebra_true {K R : Type*} [Field K] [CharZero K] [CommRing R] [Algebra K R] :
+    True := True.intro
+
+theorem genericInv_refl {K : Type*} [Field K] [CharZero K] (q : K) : q⁻¹ = q⁻¹ := rfl
+
+theorem genericInvMapMul_refl
+    {K R : Type*} [Field K] [CharZero K] [CommRing R] [Algebra K R] (q : K) (x : R) :
+    algebraMap K R q⁻¹ * x = algebraMap K R q⁻¹ * x := rfl
+
+theorem genericNatCastMapMul_refl
+    {K R : Type*} [Field K] [CharZero K] [CommRing R] [Algebra K R] (n : ℕ) :
+    algebraMap K R ((n : K)⁻¹) * (n : R) = algebraMap K R ((n : K)⁻¹) * (n : R) := rfl
+
 end SDG.Axiom
 
 #print axioms SDG.Axiom.ratInv_refl
 #print axioms SDG.Axiom.ratAlgebra_true
 #print axioms SDG.Axiom.ratInvSmul_refl
 #print axioms SDG.Axiom.ratInvMapMul_refl
+#print axioms SDG.Axiom.genericField_true
+#print axioms SDG.Axiom.genericAlgebra_true
+#print axioms SDG.Axiom.genericInv_refl
+#print axioms SDG.Axiom.genericInvMapMul_refl
+#print axioms SDG.Axiom.genericNatCastMapMul_refl
 
 #print axioms SDG.rat_natCast_ne_zero
 #print axioms SDG.inv_factorial_algebraMap_mul_succ_iff
