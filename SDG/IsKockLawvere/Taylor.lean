@@ -34,52 +34,27 @@ theorem taylor_two [Invertible (2 : R)] (f : R → R) (x : R) (δ : 𝔻 R 2) :
   simp [((cancel_d (fun _ ↦ cancel_d (fun _ ↦ this _ _))).symm : ∂∂f x = b 1 * 2), mul_assoc,
     mul_comm ((δ : R) ^ 2)]
 
-/-- A direct nonzero criterion for natural-number casts into `ℚ`, using the rational numerator. -/
-lemma rat_natCast_ne_zero {n : ℕ} (hn : n ≠ 0) : (n : ℚ) ≠ 0 := by
-  intro h
-  have hnum : (n : ℤ) = 0 := by
-    simpa only [Rat.num_natCast, Rat.num_zero] using congrArg Rat.num h
-  exact hn (Int.ofNat.inj hnum)
-
 open Nat in
-/-- The factorial-scalar step over an arbitrary characteristic-zero coefficient field. -/
-lemma inv_factorial_algebraMap_mul_succ_iff {K R : Type*} [Field K] [CharZero K]
-    [CommRing R] [Algebra K R] {n : ℕ} {x y : R} :
-    algebraMap K R ((n ! : K)⁻¹) * y = algebraMap K R (((n + 1)! : K)⁻¹) * x ↔
-      x = (n + 1) * y := by
-  have hfact : (n ! : K) ≠ 0 := Nat.cast_ne_zero.mpr (factorial_ne_zero n)
-  have hsuccfact : ((n + 1)! : K) ≠ 0 := Nat.cast_ne_zero.mpr (factorial_ne_zero (n + 1))
-  have hn1 : (↑(n + 1) : K) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.succ_ne_zero n)
-  have hfac : ((n + 1)! : K) = (↑(n + 1) : K) * (n ! : K) := by
-    rw [factorial_succ, Nat.cast_mul]
-  have hstep : algebraMap K R (↑(n + 1) : K) = (↑(n + 1) : R) := by
-    rw [map_natCast]
-  constructor
-  · intro h
-    have h' := congrArg (fun z : R ↦ algebraMap K R ((n + 1)! : K) * z) h
-    rw [← mul_assoc, ← mul_assoc, ← map_mul, ← map_mul] at h'
-    have hleft : ((n + 1)! : K) * (n ! : K)⁻¹ = (↑(n + 1) : K) := by
-      rw [hfac, mul_assoc, mul_inv_cancel₀ hfact, mul_one]
-    have hright : ((n + 1)! : K) * ((n + 1)! : K)⁻¹ = 1 :=
-      mul_inv_cancel₀ hsuccfact
-    rw [hleft, hright, map_one, one_mul] at h'
-    calc
-      x = algebraMap K R (↑(n + 1) : K) * y := h'.symm
-      _ = (↑(n + 1) : R) * y := by rw [hstep]
-      _ = (n + 1) * y := by rw [Nat.cast_succ]
-  · intro h
-    have hxR : x = (↑(n + 1) : R) * y := by
-      simpa only [Nat.cast_succ] using h
-    have hscalar : ((n + 1)! : K)⁻¹ * (↑(n + 1) : K) = (n ! : K)⁻¹ := by
-      rw [hfac, mul_inv_rev, mul_assoc, inv_mul_cancel₀ hn1, mul_one]
-    rw [hxR, ← hstep, ← mul_assoc, ← map_mul, hscalar]
+lemma inv_factorial_smul_succ_iff {R : Type*} [CommRing R] [Algebra ℚ R] {n : ℕ} {x y : R} :
+    (n ! : ℚ)⁻¹ • y = ((n + 1)! : ℚ)⁻¹ • x ↔ x = (n + 1) * y := by
+  have hfact : (n ! : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_pos n).ne'
+  have hn1 : (↑(n + 1) : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.succ_ne_zero n)
+  refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
+  · have h' : x = ((n + 1)! : ℚ) • (n ! : ℚ)⁻¹ • y :=
+      calc x = ((n + 1)! : ℚ) • ((n + 1)! : ℚ)⁻¹ • x := by
+               rw [smul_smul, mul_inv_cancel₀ (cast_ne_zero.mpr (factorial_pos _).ne'), one_smul]
+           _ = _:= by rw [h]
+    rw [h', smul_smul, factorial_succ, Nat.cast_mul, mul_assoc, mul_inv_cancel₀ hfact, mul_one,
+      Algebra.smul_def, map_natCast]
+    norm_cast
+  · rw [h, show (↑n + 1 : R) * y = (↑(n + 1) : ℚ) • y by simp [Algebra.smul_def], smul_smul,
+      factorial_succ, Nat.cast_mul, mul_inv_rev, mul_assoc, inv_mul_cancel₀ hn1, mul_one]
 
-/-- Inverse natural-cast cancellation over an arbitrary characteristic-zero coefficient field. -/
-lemma inv_natCast_algebraMap_mul_natCast {K R : Type*} [Field K] [CharZero K]
-    [CommRing R] [Algebra K R] {n : ℕ} (hn : n ≠ 0) :
-    algebraMap K R ((n : K)⁻¹) * (n : R) = 1 := by
-  have hnK : (n : K) ≠ 0 := Nat.cast_ne_zero.mpr hn
-  rw [← map_natCast (algebraMap K R), ← map_mul, inv_mul_cancel₀ hnK, map_one]
+/-- `(n : ℚ)⁻¹ • (n : R) = 1` for `n ≠ 0`, via the algebra map. -/
+lemma inv_natCast_smul_natCast {R : Type*} [CommRing R] [Algebra ℚ R] {n : ℕ}
+    (hn : n ≠ 0) : (n : ℚ)⁻¹ • (n : R) = 1 := by
+  rw [Algebra.smul_def, ← map_natCast (algebraMap ℚ R) n, ← map_mul, inv_mul_cancel₀
+    (Nat.cast_ne_zero.2 hn), map_one]
 
 theorem taylor_k_aux {k : ℕ} [Algebra ℚ R] (f : R → R) (x : R) (d : Fin k → D R) :
     letI δ : R := ∑ n, d n
@@ -105,33 +80,26 @@ match k with
   rcases (eq_castSucc_or_eq_last n).symm with rfl | ⟨m', rfl⟩
   · simp only [succ_eq_add_one, snoc_last, val_succ, Function.iterate_succ,
     Function.comp_apply, cons_last, val_last, zero_add, mul_assoc]
-    rw [hδΔ, mem_D_add_pow, mem_D_univ_sum_pow_succ, add_zero,
+    rw [hδΔ, mem_D_add_pow, mem_D_sum_pow_succ, add_zero,
       mul_comm (↑(k + 1) : R), mul_assoc, mul_comm (↑(k + 1) : R)]
     congr
-    simp only [Algebra.smul_def]
-    rw [mul_assoc]
-    apply (inv_factorial_algebraMap_mul_succ_iff (K := ℚ) (R := R)).2
-    rw [Nat.cast_add, Nat.cast_one]
+    simp [inv_factorial_smul_succ_iff]
     ring
   obtain ⟨m, hm⟩ := eq_succ_of_ne_zero h
   simp only [succ_eq_add_one, snoc_castSucc, val_succ, Function.iterate_succ,
     Function.comp_apply, val_castSucc]
   simp only [hm, cons_succ, mul_assoc, ← val_castSucc m', ← Function.iterate_succ_apply,
     val_succ, ← mul_add]
-  rw [hδΔ, mem_D_add_pow, pow_succ, mul_comm _ (δ ^ m.1), ← mul_add,
-    mul_comm (↑(m.1 + 1) : R), mul_add (δ ^ m.1), add_comm (δ ^ m.1 * _), smul_add,
-    mul_comm (d 0).1]
+  rw [hδΔ, mem_D_add_pow, pow_succ, mul_comm _ (δ ^ m.1), ← mul_add, mul_comm (↑(m.1 + 1) : R),
+    mul_add (δ ^ m.1), add_comm (δ ^ m.1 * _), smul_add, mul_comm (d 0).1]
   congr
   rw [← mul_assoc, ← smul_mul_assoc]
   congr 1
-  simp only [Algebra.smul_def]
-  apply (inv_factorial_algebraMap_mul_succ_iff (K := ℚ) (R := R)).2
-  rw [Nat.cast_add, Nat.cast_one]
+  simp [inv_factorial_smul_succ_iff]
   ring
 
 theorem taylor_k_aux_zero (k : ℕ) (f : R → R) (x : R) (B : Fin (k + 1) → R)
-    (hB : ∀ (d : (𝔻 R (k + 1))), f (x + d) = f x + ∑ i, B i * d ^ (i.1 + 1)) :
-    B 0 = ∂f x := by
+    (hB : ∀ (d : (𝔻 R (k + 1))), f (x + d) = f x + ∑ i, B i * d ^ (i.1 + 1)) : B 0 = ∂f x := by
   refine (derivative_unique (fun d ↦ ?_)).symm
   rw [hB ⟨d, 𝔻_le (Nat.le_add_left ..) d.2⟩, add_right_inj, sum_univ_succ]
   convert add_zero _
@@ -150,21 +118,20 @@ theorem taylor_k_aux' [Algebra ℚ R] (k : ℕ) (f : R → R) (x : R) (b : Fin (
   refine cancel_d_fun (n + 2) (fun d ↦ ?_)
   set δ := ∑ n, (d n).1 with hδ_def
   have hb_deriv := taylor_k_aux_zero k f x b hb
-  have Hb := hb ⟨δ, 𝔻_le (succ_le_of_lt hn) (mem_D_univ_sum_pow_succ d)⟩
+  have Hb := hb ⟨δ, 𝔻_le (succ_le_of_lt hn) (mem_D_sum_pow_succ d)⟩
   rw [taylor_k_aux f, ← hδ_def, sum_univ_succ (n := n + 2), val_zero, Function.iterate_zero,
     id_eq, pow_zero, factorial_zero, cast_one, inv_one, one_smul, mul_one, add_right_inj,
       sum_univ_succ (n := k), val_zero, zero_add, pow_one, hb_deriv, sum_univ_succ (n := n + 1),
       val_succ, val_zero, zero_add, Function.iterate_one, pow_one, factorial_one, cast_one,
       inv_one, one_smul, add_right_inj, sum_castLE_of_eq_zero (le_of_lt_succ hn) _
-      (fun _ h ↦ by convert mul_zero _; exact 𝔻_le (succ_le_succ h) (mem_D_univ_sum_pow_succ d)),
+      (fun _ h ↦ by convert mul_zero _; exact 𝔻_le (succ_le_succ h) (mem_D_sum_pow_succ d)),
       sum_univ_succAbove _ (last n), sum_univ_succAbove _ (last n)] at Hb
   replace Hb := (eq_iff_eq_of_add_eq_add Hb).mpr ?_
   · simp only [succ_eq_add_one, succ_mk, Function.iterate_succ, Function.comp_apply]
     simp only [succ_last, succ_eq_add_one, val_last, Function.iterate_succ,
       Function.comp_apply, val_succ, val_castLE] at Hb
-    rw [mem_D_univ_sum_pow d, mul_comm ((n + 2)! : R), mul_comm _ ((n + 2)! : R),
-      ← smul_mul_assoc, Algebra.smul_def,
-      inv_natCast_algebraMap_mul_natCast (K := ℚ) (R := R) (factorial_ne_zero _), one_mul] at Hb
+    rw [mem_D_sum_pow d, mul_comm ((n + 2)! : R), mul_comm _ ((n + 2)! : R), ← smul_mul_assoc,
+      inv_natCast_smul_natCast (factorial_ne_zero _), one_mul] at Hb
     exact Hb ▸ mul_assoc ..
   · congr
     ext j
@@ -175,7 +142,7 @@ theorem taylor_k_aux' [Algebra ℚ R] (k : ℕ) (f : R → R) (x : R) (b : Fin (
     rw [← this, mul_assoc]
     congr
     rw [Algebra.smul_def, ← mul_assoc, ← map_natCast (algebraMap ℚ R), ← map_mul,
-        mul_inv_cancel₀ (rat_natCast_ne_zero (factorial_ne_zero _)), map_one, one_mul]
+        mul_inv_cancel₀ (Nat.cast_ne_zero.mpr (factorial_ne_zero _)), map_one, one_mul]
 decreasing_by rw [Fin.sizeOf, Fin.sizeOf, Nat.succ_lt_succ_iff]
               exact succ_le_succ j.2
 
@@ -193,6 +160,6 @@ theorem taylor_k [Algebra ℚ R] (f : R → R) (x : R) : ∀ (k : ℕ) (δ : �
   rw [← taylor_k_aux' k f x b (fun d ↦ hb _ d.2), mul_assoc]
   congr
   rw [Algebra.smul_def, ← mul_assoc, ← map_natCast (algebraMap ℚ R), ← map_mul,
-      mul_inv_cancel₀ (rat_natCast_ne_zero (factorial_ne_zero _)), map_one, one_mul, val_succ]
+      mul_inv_cancel₀ (Nat.cast_ne_zero.mpr (factorial_ne_zero _)), map_one, one_mul, val_succ]
 
 end SDG
