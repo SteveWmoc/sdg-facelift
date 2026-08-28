@@ -6,6 +6,7 @@ public import Mathlib.Data.Nat.Factorial.Basic
 public import Mathlib.Algebra.BigOperators.Fin
 
 public import SDG.Basic.Defs
+public import SDG.ForMathlib.FinChoiceFree
 
 /-!
 # Lemmas about nilpotent subsemigroups
@@ -59,21 +60,39 @@ theorem mem_D_add_pow (x : D R) (y : R) : ∀ (k : ℕ), (x + y) ^ (k + 1) =
     (k + 1) * x ^ 2 * y ^ k := by ring
        _ = _ := by simp; ring
 
-lemma mem_D_sum_pow_succ : ∀ {k : ℕ} (b : Fin k → D R), (∑ i, (b i : R)) ^ (k + 1) = 0
-| 0 => fun b ↦ by
+/-- Choice-free finite-sum form of `mem_D_sum_pow_succ`. -/
+lemma mem_D_sum_pow_succ_choiceFree : ∀ {k : ℕ} (b : Fin k → D R),
+    (FinChoiceFree.sum k (fun i => (b i : R))) ^ (k + 1) = 0
+| 0 => fun _ ↦ by
   rw [zero_add, pow_one]
-  exact sum_empty
+  rfl
 | k + 1 => fun b ↦ by
-  rw [Fin.sum_univ_succ, mem_D_add_pow, mem_D_sum_pow_succ, mul_zero, zero_add, pow_succ,
-    mem_D_sum_pow_succ, zero_mul]
+  rw [FinChoiceFree.sum_succ, mem_D_add_pow, mem_D_sum_pow_succ_choiceFree, mul_zero,
+    zero_add, pow_succ, mem_D_sum_pow_succ_choiceFree, zero_mul]
 
-open Nat in
-lemma mem_D_sum_pow : ∀ {k : ℕ} (b : Fin k → D R), (∑ i, (b i : R)) ^ k = (k ! : R) * ∏ i, (b i).1
-| 0 => by simp
+/-- Choice-free finite-sum/product form of `mem_D_sum_pow`. -/
+lemma mem_D_sum_pow_choiceFree : ∀ {k : ℕ} (b : Fin k → D R),
+    (FinChoiceFree.sum k (fun i => (b i : R))) ^ k =
+      (k ! : R) * FinChoiceFree.prod k (fun i => (b i).1)
+| 0 => fun _ ↦ by
+  simp only [FinChoiceFree.sum_zero, FinChoiceFree.prod_zero, pow_zero, factorial_zero,
+    cast_one, one_mul]
 | k + 1 => fun b ↦ by
-  rw [Fin.sum_univ_succ, mem_D_add_pow, mem_D_sum_pow_succ, add_zero, mem_D_sum_pow,
-    Fin.prod_univ_succ, factorial_succ, cast_mul]
+  rw [FinChoiceFree.sum_succ, mem_D_add_pow, mem_D_sum_pow_succ_choiceFree, add_zero,
+    mem_D_sum_pow_choiceFree, FinChoiceFree.prod_succ, factorial_succ, cast_mul]
   ring
+
+/-- Compatibility form using Mathlib's generic finite sum. -/
+lemma mem_D_sum_pow_succ {k : ℕ} (b : Fin k → D R) :
+    (∑ i, (b i : R)) ^ (k + 1) = 0 := by
+  rw [← FinChoiceFree.sum_eq_univ]
+  exact mem_D_sum_pow_succ_choiceFree b
+
+/-- Compatibility form using Mathlib's generic finite sum and product. -/
+lemma mem_D_sum_pow {k : ℕ} (b : Fin k → D R) :
+    (∑ i, (b i : R)) ^ k = (k ! : R) * ∏ i, (b i).1 := by
+  rw [← FinChoiceFree.sum_eq_univ, ← FinChoiceFree.prod_eq_univ]
+  exact mem_D_sum_pow_choiceFree b
 
 lemma D_add_sq_dvd_two [Invertible (2 : R)] (d₁ d₂ : D R) :
     (d₁ + d₂ : R) ^ 2 * ⅟2 = d₁ * d₂ := by
