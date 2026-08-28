@@ -6,7 +6,6 @@ public import Mathlib.Data.Fintype.Basic
 public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 public import SDG.Axiom.UniqueChoice
-public import SDG.ForMathlib.FinChoiceFree
 
 /-!
 # Core definitions for Synthetic Differential Geometry
@@ -60,45 +59,21 @@ of the form `g d = g 0 + b * d` for some `b : R`. -/
 class IsKockLawvere_one extends Nontrivial R where
   isKockLawvere_one : ∀ g : D R → R, ∃! b, ∀ d, g d = g 0 + b * d
 
-/-- The general Kock-Lawvere axiom, stated using the choice-free finite sum. Every
-`g : 𝔻 R k → R` is uniquely a polynomial of degree `k` in the infinitesimal. -/
+/-- The general Kock-Lawvere axiom: every `g : 𝔻 R k → R` is uniquely a polynomial of degree `k`
+in the infinitesimal, i.e. `g d = g 0 + ∑ i, b i * d^(i+1)` for a unique `b : Fin k → R`. -/
 class IsKockLawvere extends Nontrivial R where
-  isKockLawvere_choiceFree : ∀ k, ∀ g : 𝔻 R k → R,
-    ∃! b : Fin k → R, ∀ d,
-      g d = g 0 + FinChoiceFree.sum k (fun i ↦ b i * d ^ (i.val + 1))
-
-namespace IsKockLawvere
-
-/-- Compatibility bridge from the choice-free Kock-Lawvere class field to Mathlib's generic
-finite sum. This theorem intentionally inherits the axiom dependencies of the generic big operator. -/
-theorem isKockLawvere {R : Type*} [CommRing R] [IsKockLawvere R]
-    (k : ℕ) (g : 𝔻 R k → R) :
-    ∃! b : Fin k → R, ∀ d, g d = g 0 + ∑ i, b i * d ^ (i.val + 1) := by
-  obtain ⟨b, hb, hbunique⟩ := IsKockLawvere.isKockLawvere_choiceFree k g
-  refine ⟨b, ?_, ?_⟩
-  · intro d
-    rw [← FinChoiceFree.sum_eq_univ]
-    exact hb d
-  · intro b' hb'
-    apply hbunique b'
-    intro d
-    rw [FinChoiceFree.sum_eq_univ]
-    exact hb' d
-
-end IsKockLawvere
+  isKockLawvere : ∀ k, ∀ g : 𝔻 R k → R,
+    ∃! b : Fin k → R, ∀ d, g d = g 0 + ∑ i, b i * d ^ (i.val + 1)
 
 instance [IsKockLawvere R] : IsKockLawvere_one R where
   isKockLawvere_one := fun g ↦ by
-    obtain ⟨b, hb, hbunique⟩ := IsKockLawvere.isKockLawvere_choiceFree 1 g
-    refine ⟨b 0, ?_, ?_⟩
-    · intro d
-      simpa only [FinChoiceFree.sum_succ, FinChoiceFree.sum_zero, add_zero, Fin.val_zero,
-        zero_add, pow_one] using hb d
-    · intro b' hb'
-      have hfun := hbunique (fun _ ↦ b') (fun d ↦ by
-        simpa only [FinChoiceFree.sum_succ, FinChoiceFree.sum_zero, add_zero, Fin.val_zero,
-          zero_add, pow_one] using hb' d)
-      exact congrFun hfun 0
+    obtain ⟨b, hb, hbunique⟩ := IsKockLawvere.isKockLawvere 1 g
+    refine ⟨b 0, by simpa using hb, fun b' hb' ↦ ?_⟩
+    specialize hbunique (fun _ ↦ b')
+    simp only [Finset.univ_unique, Fin.default_eq_zero, Fin.isValue, Fin.val_eq_zero, zero_add,
+      pow_one, Finset.sum_const, Finset.card_singleton, Subtype.forall,
+      Subsemigroup.mem_mk, Nat.reduceAdd, Set.mem_ofPred_eq] at hbunique
+    rw [← hbunique (by simpa using hb')]
 
 variable [IsKockLawvere_one R]
 
